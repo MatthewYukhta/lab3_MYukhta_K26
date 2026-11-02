@@ -30,16 +30,17 @@ int main()
             stepN.count_down();
         }
 
-        for (int z = 1; z <= d; ++z)
+        for (int z = 1; z <= d / 2; ++z)
         {
             f('d', z);
+            stepK.count_down();
         }
-        stepK.arrive_and_wait(d);
+        stepK.wait();
 
-        for (int aa = 1; aa <= k; ++aa) {f('k', aa);}
+        for (int aa = 1; aa <= k/2; ++aa) {f('k', aa);}
     });
 
-    calc.emplace_back([&a, &e, &stepDG, &stepHI](){
+    calc.emplace_back([&a, &d, &e, &k, &stepDG, &stepHI, &stepK](){
         for (int x = 5; x <= a; ++x)
         {
             f('a', x);
@@ -51,9 +52,18 @@ int main()
             f('e', y);
             stepHI.count_down();
         }
+
+        for (int z = (d/2) + 1; z <= d; ++z)
+        {
+            f('d', z);
+            stepK.count_down();
+        }
+        stepK.wait();
+
+        for (int aa = (k/2) + 1; aa <= k; ++aa) {f('k', aa);}
     });
 
-    calc.emplace_back([&b, &h, &stepHI, &stepK](){
+    calc.emplace_back([&b, &F, &h, &n, &stepHI, &stepK, &stepN](){
         for (int x = 1; x <= 3; ++x)
         {
             f('b', x);
@@ -66,9 +76,17 @@ int main()
             f('h', y);
             stepK.count_down();
         }
+
+        for (int z = 1; z <= (F/3) + 1; ++z)
+        {
+            f('f', z);
+        }
+        stepN.arrive_and_wait((F/3) + 1);
+
+        f('n', n/3);
     });
 
-    calc.emplace_back([&b, &i, &stepHI, &stepN](){
+    calc.emplace_back([&b, &F, &i, &n, &stepHI, &stepN](){
         for (int x = 4; x <= b; ++x)
         {
             f('b', x);
@@ -81,6 +99,14 @@ int main()
             f('i', y);
             stepN.count_down();
         }
+
+        for (int z = F/2 + 1; z < F-1; ++z)
+        {
+            f('f', z);
+        }
+        stepN.arrive_and_wait(F/3);
+
+        f('n', n-1);
     });
 
     calc.emplace_back([&c, &F, &j, &n, &stepK, &stepN](){
@@ -92,13 +118,13 @@ int main()
             stepK.count_down();
         }
 
-        for (int z = 1; z <= F; ++z)
+        for (int z = F-1; z <= F; ++z)
         {
             f('f', z);
         }
-        stepN.arrive_and_wait(F);
+        stepN.arrive_and_wait(F/3);
 
-        for (int aa = 1; aa <= n; ++aa) {f('n', aa);}
+        f('n', n);
     });
 
     for (int i = 0; i < nt; ++i) {calc[i].join();};
